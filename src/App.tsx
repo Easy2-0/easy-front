@@ -9,6 +9,7 @@ import Layout from './components/Layout';
 import Geral from './components/geral/Geral';
 import Gastos from './components/gastos/Gastos';
 import TelaPlaceholder from './components/tela-placeholder/TelaPlaceholder';
+import Calculadora from './components/investimentos/Calculadora';
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
             <Route path="/geral" element={<Geral />} />
             <Route path="/gastos" element={<Gastos />} />
             <Route path="/saldo" element={<TelaPlaceholder mensagem="Tela de saldo em construção..." />} />
-            <Route path="/investimentos" element={<TelaPlaceholder mensagem="Tela de investimentos em construção..." />} />
+            <Route path="/investimentos" element={<Calculadora />} />
             <Route path="/calendario" element={<TelaPlaceholder mensagem="Tela de calendário em construção..." />} />
           </Route>
         </Route>
