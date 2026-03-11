@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import Toast from '../ui/Toast';
 
 const Cadastro = () => {
   const navigate = useNavigate();
@@ -9,34 +10,32 @@ const Cadastro = () => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
-  const [erro, setErro] = useState('');
-  const [sucesso, setSucesso] = useState('');
+  const [toast, setToast] = useState<{ mensagem: string; tipo: 'erro' | 'sucesso' | 'aviso' | 'info' } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErro('');
-    setSucesso('');
+    setToast(null);
 
     if (!nome || !email || !senha) {
-      setErro('Preencha todos os campos corretamente.');
+      setToast({ mensagem: 'Preencha todos os campos corretamente.', tipo: 'erro' });
       return;
     }
     if (nome.length < 3) {
-      setErro('O nome deve ter no mínimo 3 caracteres.');
+      setToast({ mensagem: 'O nome deve ter no mínimo 3 caracteres.', tipo: 'erro' });
       return;
     }
     if (senha.length < 6) {
-      setErro('A senha deve ter no mínimo 6 caracteres.');
+      setToast({ mensagem: 'A senha deve ter no mínimo 6 caracteres.', tipo: 'erro' });
       return;
     }
 
     setLoading(true);
     try {
       await api.post('/auth/cadastro', { nome, email, senha });
-      setSucesso('Conta criada com sucesso! Redirecionando...');
+      setToast({ mensagem: 'Conta criada com sucesso! Redirecionando...', tipo: 'sucesso' });
       setTimeout(() => navigate('/'), 1500);
     } catch {
-      setErro('Erro ao criar conta. Tente novamente.');
+      setToast({ mensagem: 'Erro ao criar conta. Tente novamente.', tipo: 'erro' });
     } finally {
       setLoading(false);
     }
@@ -115,9 +114,6 @@ const Cadastro = () => {
               />
             </div>
 
-            {erro && <p className="text-c-negative text-xs">{erro}</p>}
-            {sucesso && <p className="text-c-positive text-xs">{sucesso}</p>}
-
             <button
               type="submit"
               disabled={loading}
@@ -140,6 +136,15 @@ const Cadastro = () => {
         </p>
 
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <Toast
+          mensagem={toast.mensagem}
+          tipo={toast.tipo}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

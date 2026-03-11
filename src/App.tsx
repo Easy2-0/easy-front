@@ -11,6 +11,7 @@ import Gastos from './components/gastos/Gastos';
 import Saldo from './components/saldo/Saldo';
 import TelaPlaceholder from './components/tela-placeholder/TelaPlaceholder';
 import Calculadora from './components/investimentos/Calculadora';
+import Calendario from './components/calendario/Calendario';
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
             <Route path="/gastos" element={<Gastos />} />
             <Route path="/saldo" element={<Saldo />} />
             <Route path="/investimentos" element={<Calculadora />} />
-            <Route path="/calendario" element={<TelaPlaceholder mensagem="Tela de calendário em construção..." />} />
+            <Route path="/calendario" element={<Calendario />} />
           </Route>
         </Route>
 

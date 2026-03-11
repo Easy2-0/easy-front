@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import Toast from '../ui/Toast';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -8,26 +9,28 @@ const Login = () => {
 
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [erroLocal, setErroLocal] = useState('');
+  const [toast, setToast] = useState<{ mensagem: string; tipo: 'erro' | 'sucesso' | 'aviso' | 'info' } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErroLocal('');
+    setToast(null);
 
     if (!email || !senha) {
-      setErroLocal('Preencha todos os campos corretamente.');
+      setToast({ mensagem: 'Preencha todos os campos corretamente.', tipo: 'erro' });
       return;
     }
     if (senha.length < 6) {
-      setErroLocal('A senha deve ter no mínimo 6 caracteres.');
+      setToast({ mensagem: 'A senha deve ter no mínimo 6 caracteres.', tipo: 'erro' });
       return;
     }
 
     const sucesso = await login(email, senha);
-    if (sucesso) navigate('/gastos');
+    if (sucesso) {
+      navigate('/gastos');
+    } else if (error) {
+      setToast({ mensagem: error, tipo: 'erro' });
+    }
   };
-
-  const mensagemErro = erroLocal || error;
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-c-bg flex items-center justify-center px-6 py-6">
@@ -86,9 +89,6 @@ const Login = () => {
                 onChange={(e) => setSenha(e.target.value)}
                 className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
               />
-              {mensagemErro && (
-                <p className="text-c-negative text-xs">{mensagemErro}</p>
-              )}
               <div className="flex justify-end mt-1">
                 <a
                   href="#"
@@ -122,6 +122,15 @@ const Login = () => {
         </p>
 
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <Toast
+          mensagem={toast.mensagem}
+          tipo={toast.tipo}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

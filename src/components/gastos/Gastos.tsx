@@ -4,6 +4,7 @@ import { transacaoService } from '../../services/transacaoService';
 import { categoriaService } from '../../services/categoriaService';
 import { usuarioService } from '../../services/usuarioService';
 import type { Transacao, TransacaoForm, TipoTransacao, Categoria } from '../../models';
+import Toast from '../ui/Toast';
 
 // ---------------------------------------------------------------------------
 // Tipos internos
@@ -51,6 +52,196 @@ const validarForm = (form: FormState): FormErros => {
 };
 
 // ---------------------------------------------------------------------------
+// Modal de transação
+// ---------------------------------------------------------------------------
+
+interface ModalProps {
+  form: FormState;
+  setForm: (f: FormState) => void;
+  erros: FormErros;
+  salvando: boolean;
+  editando: Transacao | null;
+  categorias: Categoria[];
+  onSalvar: (e: React.FormEvent) => void;
+  onFechar: () => void;
+}
+
+const ModalTransacao = ({ form, setForm, erros, salvando, editando, categorias, onSalvar, onFechar }: ModalProps) => {
+  const [visivel, setVisivel] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisivel(true), 10);
+    return () => clearTimeout(t);
+  }, []);
+
+  const fechar = () => {
+    setVisivel(false);
+    setTimeout(onFechar, 300);
+  };
+
+  const isRec = form.tipo === 'Receita';
+  const corVar = isRec ? 'var(--color-c-positive)' : 'var(--color-c-negative)';
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center transition-all duration-300 ${visivel ? 'bg-black/60 backdrop-blur-sm' : 'bg-black/0'}`}
+      onClick={(e) => e.target === e.currentTarget && fechar()}
+    >
+      <div
+        className={`w-full sm:max-w-[460px] bg-c-surface sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden transition-all duration-300 ${
+          visivel ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        }`}
+      >
+        {/* Header colorido dinâmico */}
+        <div
+          className="relative px-6 pt-6 pb-8 transition-colors duration-300"
+          style={{ backgroundColor: `color-mix(in srgb, ${corVar} 12%, transparent)` }}
+        >
+          {/* Drag handle — mobile */}
+          <div className="sm:hidden w-10 h-1 rounded-full bg-c-border mx-auto mb-4" />
+
+          {/* Fechar */}
+          <button
+            onClick={fechar}
+            className="absolute top-5 right-5 w-8 h-8 rounded-full bg-c-text/10 hover:bg-c-text/20 flex items-center justify-center transition-all cursor-pointer border-none text-c-text/50 hover:text-c-text"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          {/* Toggle tipo */}
+          <p className="text-c-text/40 text-xs font-semibold tracking-widest uppercase mb-3">
+            {editando ? 'Editar transação' : 'Nova transação'}
+          </p>
+          <div className="flex gap-2 w-fit p-1 rounded-2xl bg-c-bg border border-c-border">
+            {(['Receita', 'Despesa'] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setForm({ ...form, tipo: t })}
+                style={form.tipo === t ? { backgroundColor: corVar, boxShadow: `0 4px 12px color-mix(in srgb, ${corVar} 35%, transparent)` } : {}}
+                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer border-none ${
+                  form.tipo === t ? 'text-white' : 'text-c-text/40 hover:text-c-text bg-transparent'
+                }`}
+              >
+                {t === 'Receita' ? '↑ Receita' : '↓ Despesa'}
+              </button>
+            ))}
+          </div>
+
+          {/* Valor — hero */}
+          <div className="mt-5 flex items-end gap-2">
+            <span className="text-c-text/40 text-lg font-bold mb-1">R$</span>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              value={form.valor}
+              onChange={(e) => setForm({ ...form, valor: e.target.value })}
+              className="flex-1 bg-transparent text-c-text text-4xl font-black outline-none placeholder:text-c-text/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+          {erros.valor && <p className="text-c-negative text-xs mt-1">{erros.valor}</p>}
+        </div>
+
+        {/* Formulário */}
+        <form onSubmit={onSalvar} className="flex flex-col gap-4 px-6 py-5">
+
+          {/* Nome + Data em linha */}
+          <div className="flex gap-3">
+            <div className="flex flex-col gap-1.5 flex-1">
+              <label className="text-c-text/40 text-[11px] font-semibold tracking-widest uppercase">Nome</label>
+              <input
+                type="text"
+                placeholder="Ex: Academia"
+                value={form.nome}
+                onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                className="w-full h-11 px-3.5 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
+              />
+              {erros.nome && <p className="text-c-negative text-[11px]">{erros.nome}</p>}
+            </div>
+            <div className="flex flex-col gap-1.5 w-36">
+              <label className="text-c-text/40 text-[11px] font-semibold tracking-widest uppercase">Data</label>
+              <input
+                type="date"
+                value={form.data}
+                onChange={(e) => setForm({ ...form, data: e.target.value })}
+                className="w-full h-11 px-3.5 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
+              />
+              {erros.data && <p className="text-c-negative text-[11px]">{erros.data}</p>}
+            </div>
+          </div>
+
+          {/* Descrição */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-c-text/40 text-[11px] font-semibold tracking-widest uppercase">Descrição <span className="normal-case font-normal">(opcional)</span></label>
+            <input
+              type="text"
+              placeholder="Ex: Mensalidade de março"
+              value={form.descricao}
+              onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+              className="w-full h-11 px-3.5 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
+            />
+          </div>
+
+          {/* Categorias como chips */}
+          {categorias.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <label className="text-c-text/40 text-[11px] font-semibold tracking-widest uppercase">Categoria <span className="normal-case font-normal">(opcional)</span></label>
+              <div className="flex gap-2 overflow-x-auto overflow-y-hidden pb-1">
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, categoriaId: '' })}
+                  className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                    !form.categoriaId
+                      ? 'text-white border-transparent'
+                      : 'bg-c-bg border-c-border text-c-text/50 hover:text-c-text'
+                  }`}
+                  style={!form.categoriaId ? { backgroundColor: corVar, borderColor: corVar } : {}}
+                >
+                  Nenhuma
+                </button>
+                {categorias.map((cat) => {
+                  const ativo = form.categoriaId === String(cat.id);
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setForm({ ...form, categoriaId: String(cat.id) })}
+                      className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                        ativo
+                          ? 'text-white border-transparent'
+                          : 'bg-c-bg border-c-border text-c-text/50 hover:text-c-text'
+                      }`}
+                      style={ativo ? { backgroundColor: corVar, borderColor: corVar } : {}}
+                    >
+                      {cat.nome}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Botão submit */}
+          <button
+            type="submit"
+            disabled={salvando}
+            style={{ backgroundColor: corVar, boxShadow: `0 4px 16px color-mix(in srgb, ${corVar} 35%, transparent)` }}
+            className="w-full h-12 rounded-2xl text-white text-sm font-bold tracking-wide transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-none mt-1 hover:brightness-110 active:scale-[0.98]"
+          >
+            {salvando ? 'Salvando...' : editando ? 'Salvar alterações' : `Adicionar ${form.tipo}`}
+          </button>
+
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
 // Componente principal
 // ---------------------------------------------------------------------------
 
@@ -66,6 +257,8 @@ const Gastos = () => {
   const [form, setForm] = useState<FormState>(FORM_INICIAL);
   const [erros, setErros] = useState<FormErros>({});
   const [salvando, setSalvando] = useState(false);
+  const [toast, setToast] = useState<{ mensagem: string; tipo: 'erro' | 'sucesso' | 'aviso' | 'info' } | null>(null);
+  const [fabVisivel, setFabVisivel] = useState(false);
 
   // -------------------------------------------------------------------------
   // Carregar transações
@@ -74,6 +267,8 @@ const Gastos = () => {
   useEffect(() => {
     carregarTransacoes();
     categoriaService.buscarTodas().then(setCategorias).catch(() => {});
+    const t = setTimeout(() => setFabVisivel(true), 100);
+    return () => clearTimeout(t);
   }, []);
 
   const carregarTransacoes = async () => {
@@ -107,9 +302,9 @@ const Gastos = () => {
   // Modal
   // -------------------------------------------------------------------------
 
-  const abrirModal = () => {
+  const abrirModal = (tipo?: 'Receita' | 'Despesa') => {
     setEditando(null);
-    setForm(FORM_INICIAL);
+    setForm({ ...FORM_INICIAL, ...(tipo ? { tipo } : {}) });
     setErros({});
     setMostrarModal(true);
   };
@@ -161,15 +356,18 @@ const Gastos = () => {
       if (editando?.id) {
         const atualizada = await transacaoService.atualizar(editando.id, payload, usuarioId);
         lista = movimentos.map((t) => (t.id === atualizada.id ? atualizada : t));
+        setToast({ mensagem: 'Transação atualizada com sucesso!', tipo: 'sucesso' });
       } else {
         const nova = await transacaoService.criar(payload, usuarioId);
         lista = [...movimentos, nova];
+        const label = nova.tipo === 'Receita' ? 'Receita' : 'Despesa';
+        setToast({ mensagem: `${label} adicionada com sucesso!`, tipo: 'sucesso' });
       }
       setMovimentos(lista);
       atualizarBalance(lista);
       fecharModal();
     } catch {
-      // mantém modal aberto em caso de erro
+      setToast({ mensagem: 'Erro ao salvar transação. Tente novamente.', tipo: 'erro' });
     } finally {
       setSalvando(false);
     }
@@ -186,8 +384,9 @@ const Gastos = () => {
       const lista = movimentos.filter((t) => t.id !== transacao.id);
       setMovimentos(lista);
       atualizarBalance(lista);
+      setToast({ mensagem: 'Transação removida.', tipo: 'sucesso' });
     } catch {
-      // silencioso
+      setToast({ mensagem: 'Erro ao remover transação. Tente novamente.', tipo: 'erro' });
     }
   };
 
@@ -283,151 +482,36 @@ const Gastos = () => {
         </div>
       )}
 
-      {/* FAB */}
-      {!carregando && (
-        <button
-          onClick={abrirModal}
-          title="Nova transação"
-          className="fixed right-7 bottom-7 w-14 h-14 rounded-2xl bg-c-accent text-white text-2xl font-bold shadow-lg shadow-c-accent/30 hover:opacity-85 transition-all duration-200 cursor-pointer border-none flex items-center justify-center"
-        >
-          +
-        </button>
-      )}
+      {/* FAB estendido */}
+      <button
+        onClick={() => abrirModal()}
+        className={`fixed right-6 top-20 z-50 flex items-center gap-2.5 px-5 h-12 rounded-full bg-c-accent text-white shadow-lg shadow-c-accent/40 hover:shadow-c-accent/60 hover:brightness-110 active:scale-95 cursor-pointer border-none transition-all duration-300 ${
+          fabVisivel ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
+        }`}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        <span className="text-sm font-bold tracking-wide whitespace-nowrap">Nova transação</span>
+      </button>
 
       {/* Modal */}
+      {toast && (
+        <Toast mensagem={toast.mensagem} tipo={toast.tipo} onClose={() => setToast(null)} />
+      )}
+
       {mostrarModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
-          onClick={(e) => e.target === e.currentTarget && fecharModal()}
-        >
-          <div className="w-full max-w-[440px] bg-c-surface border border-c-border rounded-3xl shadow-2xl overflow-hidden">
-
-            {/* Cabeçalho */}
-            <div className="flex items-center justify-between px-8 py-5 border-b border-c-border">
-              <h3 className="text-c-text font-bold text-base tracking-widest uppercase">
-                {editando ? 'Editar Transação' : 'Nova Transação'}
-              </h3>
-              <button
-                onClick={fecharModal}
-                className="text-c-text/40 hover:text-c-text transition-colors text-xl cursor-pointer bg-transparent border-none"
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Formulário */}
-            <form onSubmit={handleSalvar} className="flex flex-col gap-5 px-8 py-6">
-
-              {/* Tipo */}
-              <div className="flex flex-col gap-2">
-                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Tipo</label>
-                <select
-                  value={form.tipo}
-                  onChange={(e) => setForm({ ...form, tipo: e.target.value as FormState['tipo'] })}
-                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all cursor-pointer"
-                >
-                  <option value="Despesa">Despesa (saída)</option>
-                  <option value="Receita">Receita (entrada)</option>
-                </select>
-              </div>
-
-              {/* Nome */}
-              <div className="flex flex-col gap-2">
-                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Nome</label>
-                <input
-                  type="text"
-                  placeholder="Ex: Academia"
-                  value={form.nome}
-                  onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
-                />
-                {erros.nome && <p className="text-c-negative text-xs">{erros.nome}</p>}
-              </div>
-
-              {/* Descrição */}
-              <div className="flex flex-col gap-2">
-                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Descrição</label>
-                <input
-                  type="text"
-                  placeholder="Ex: Mensalidade"
-                  value={form.descricao}
-                  onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
-                />
-              </div>
-
-              {/* Categoria */}
-              <div className="flex flex-col gap-2">
-                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">
-                  Categoria <span className="normal-case text-c-text/30 tracking-normal font-normal">(opcional)</span>
-                </label>
-                <select
-                  value={form.categoriaId}
-                  onChange={(e) => setForm({ ...form, categoriaId: e.target.value })}
-                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all cursor-pointer"
-                >
-                  <option value="">Sem categoria</option>
-                  {categorias.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Valor */}
-              <div className="flex flex-col gap-2">
-                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Valor</label>
-                <div className="flex items-center gap-2">
-                  <span className="text-c-accent font-bold text-sm px-3 h-[42px] flex items-center rounded-xl bg-c-bg border border-c-border">
-                    R$
-                  </span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0,00"
-                    value={form.valor}
-                    onChange={(e) => setForm({ ...form, valor: e.target.value })}
-                    className="flex-1 h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
-                  />
-                </div>
-                {erros.valor && <p className="text-c-negative text-xs">{erros.valor}</p>}
-              </div>
-
-              {/* Data */}
-              <div className="flex flex-col gap-2">
-                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Data</label>
-                <input
-                  type="date"
-                  value={form.data}
-                  onChange={(e) => setForm({ ...form, data: e.target.value })}
-                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
-                />
-                {erros.data && <p className="text-c-negative text-xs">{erros.data}</p>}
-              </div>
-
-              {/* Botões */}
-              <div className="flex gap-3 mt-2">
-                <button
-                  type="submit"
-                  disabled={salvando}
-                  className="flex-1 h-[42px] bg-c-accent text-white text-sm font-bold rounded-xl tracking-widest hover:opacity-85 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-none"
-                >
-                  {salvando ? 'SALVANDO...' : editando ? 'SALVAR' : 'CRIAR'}
-                </button>
-                <button
-                  type="button"
-                  onClick={fecharModal}
-                  className="flex-1 h-[42px] bg-c-bg text-c-text/60 text-sm font-semibold rounded-xl border border-c-border hover:text-c-text hover:border-c-text/30 transition-all cursor-pointer"
-                >
-                  CANCELAR
-                </button>
-              </div>
-
-            </form>
-          </div>
-        </div>
+        <ModalTransacao
+          form={form}
+          setForm={setForm}
+          erros={erros}
+          salvando={salvando}
+          editando={editando}
+          categorias={categorias}
+          onSalvar={handleSalvar}
+          onFechar={fecharModal}
+        />
       )}
 
     </div>
