@@ -193,29 +193,29 @@ const Gastos = () => {
 
       {/* Título */}
       <div>
-        <h1 className="text-white text-xl font-bold">Transações</h1>
-        <p className="text-white/50 text-sm mt-1">Gerencie suas entradas e saídas</p>
+        <h1 className="text-c-text text-xl font-bold">Transações</h1>
+        <p className="text-c-text/50 text-sm mt-1">Gerencie suas entradas e saídas</p>
       </div>
 
       {/* Carregando */}
       {carregando && (
         <div className="flex items-center justify-center min-h-[40vh]">
-          <p className="text-white/50 text-sm">Carregando...</p>
+          <p className="text-c-text/40 text-sm">Carregando...</p>
         </div>
       )}
 
       {/* Estado vazio */}
       {!carregando && movimentos.length === 0 && (
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
-          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2bb39a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-c-surface border border-c-border">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-c-accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
           </div>
-          <p className="text-white/50 text-sm text-center">
+          <p className="text-c-text/40 text-sm text-center">
             Você ainda não possui nenhuma transação.{' '}
-            <button onClick={abrirModal} className="text-[#2bb39a] font-semibold hover:text-[#bfe9df] transition-colors cursor-pointer bg-transparent border-none">
+            <button onClick={abrirModal} className="text-c-accent font-semibold hover:text-c-accent/70 transition-colors cursor-pointer bg-transparent border-none">
               Criar aqui
             </button>
           </p>
@@ -228,20 +228,20 @@ const Gastos = () => {
           {movimentos.map((t) => (
             <div
               key={t.id}
-              className="flex items-center justify-between bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4"
+              className="flex items-center justify-between bg-c-surface border border-c-border rounded-2xl px-6 py-4"
             >
               {/* Dados */}
               <div className="flex flex-col gap-1">
-                <span className="text-white font-bold text-base tracking-wide">{t.nome}</span>
+                <span className="text-c-text font-bold text-base tracking-wide">{t.nome}</span>
                 {t.descricao && (
-                  <span className="text-white/50 text-xs">{t.descricao}</span>
+                  <span className="text-c-text/40 text-xs">{t.descricao}</span>
                 )}
-                <span className="text-white/30 text-xs">{new Date(t.data).toLocaleDateString('pt-BR')}</span>
+                <span className="text-c-text/30 text-xs">{new Date(t.data).toLocaleDateString('pt-BR')}</span>
               </div>
 
               {/* Valor e ações */}
               <div className="flex items-center gap-4">
-                <span className={`font-bold text-base ${isReceita(t.tipo) ? 'text-[#2bb39a]' : 'text-[#e24b4b]'}`}>
+                <span className={`font-bold text-base ${isReceita(t.tipo) ? 'text-c-positive' : 'text-c-negative'}`}>
                   {isReceita(t.tipo) ? '+' : '-'} {formatarValor(t.valor)}
                 </span>
 
@@ -249,7 +249,7 @@ const Gastos = () => {
                 <button
                   onClick={() => abrirModalEdicao(t)}
                   title="Editar"
-                  className="text-white/40 hover:text-white transition-colors cursor-pointer bg-transparent border-none"
+                  className="text-c-text/30 hover:text-c-text transition-colors cursor-pointer bg-transparent border-none"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -261,7 +261,7 @@ const Gastos = () => {
                 <button
                   onClick={() => handleRemover(t)}
                   title="Excluir"
-                  className="text-[#e24b4b]/60 hover:text-[#e24b4b] transition-colors cursor-pointer bg-transparent border-none"
+                  className="text-c-negative/50 hover:text-c-negative transition-colors cursor-pointer bg-transparent border-none"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="3 6 5 6 21 6" />
@@ -281,7 +281,7 @@ const Gastos = () => {
         <button
           onClick={abrirModal}
           title="Nova transação"
-          className="fixed right-7 bottom-7 w-14 h-14 rounded-2xl bg-[#2bb39a] text-white text-2xl font-bold shadow-lg shadow-[#2bb39a]/40 hover:bg-[#3a4f4b] transition-all duration-200 cursor-pointer border-none flex items-center justify-center"
+          className="fixed right-7 bottom-7 w-14 h-14 rounded-2xl bg-c-accent text-white text-2xl font-bold shadow-lg shadow-c-accent/30 hover:opacity-85 transition-all duration-200 cursor-pointer border-none flex items-center justify-center"
         >
           +
         </button>
@@ -290,19 +290,19 @@ const Gastos = () => {
       {/* Modal */}
       {mostrarModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
           onClick={(e) => e.target === e.currentTarget && fecharModal()}
         >
-          <div className="w-full max-w-[440px] bg-[#1e3d3a] border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+          <div className="w-full max-w-[440px] bg-c-surface border border-c-border rounded-3xl shadow-2xl overflow-hidden">
 
             {/* Cabeçalho */}
-            <div className="flex items-center justify-between px-8 py-5 border-b border-white/10">
-              <h3 className="text-white font-bold text-base tracking-widest uppercase">
+            <div className="flex items-center justify-between px-8 py-5 border-b border-c-border">
+              <h3 className="text-c-text font-bold text-base tracking-widest uppercase">
                 {editando ? 'Editar Transação' : 'Nova Transação'}
               </h3>
               <button
                 onClick={fecharModal}
-                className="text-white/40 hover:text-white transition-colors text-xl cursor-pointer bg-transparent border-none"
+                className="text-c-text/40 hover:text-c-text transition-colors text-xl cursor-pointer bg-transparent border-none"
               >
                 ×
               </button>
@@ -313,47 +313,47 @@ const Gastos = () => {
 
               {/* Tipo */}
               <div className="flex flex-col gap-2">
-                <label className="text-[#bfe9df] text-xs font-semibold tracking-widest uppercase">Tipo</label>
+                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Tipo</label>
                 <select
                   value={form.tipo}
                   onChange={(e) => setForm({ ...form, tipo: e.target.value as FormState['tipo'] })}
-                  className="w-full h-[42px] px-4 rounded-xl bg-white/10 border border-white/20 text-white text-sm outline-none focus:border-[#2bb39a] transition-all cursor-pointer"
+                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all cursor-pointer"
                 >
-                  <option value="Despesa" className="bg-[#1e3d3a]">Despesa (saída)</option>
-                  <option value="Receita" className="bg-[#1e3d3a]">Receita (entrada)</option>
+                  <option value="Despesa">Despesa (saída)</option>
+                  <option value="Receita">Receita (entrada)</option>
                 </select>
               </div>
 
               {/* Nome */}
               <div className="flex flex-col gap-2">
-                <label className="text-[#bfe9df] text-xs font-semibold tracking-widest uppercase">Nome</label>
+                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Nome</label>
                 <input
                   type="text"
                   placeholder="Ex: Academia"
                   value={form.nome}
                   onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                  className="w-full h-[42px] px-4 rounded-xl bg-white/10 border border-white/20 text-white text-sm placeholder-white/30 outline-none focus:border-[#2bb39a] transition-all"
+                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
                 />
-                {erros.nome && <p className="text-[#e24b4b] text-xs">{erros.nome}</p>}
+                {erros.nome && <p className="text-c-negative text-xs">{erros.nome}</p>}
               </div>
 
               {/* Descrição */}
               <div className="flex flex-col gap-2">
-                <label className="text-[#bfe9df] text-xs font-semibold tracking-widest uppercase">Descrição</label>
+                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Descrição</label>
                 <input
                   type="text"
                   placeholder="Ex: Mensalidade"
                   value={form.descricao}
                   onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-                  className="w-full h-[42px] px-4 rounded-xl bg-white/10 border border-white/20 text-white text-sm placeholder-white/30 outline-none focus:border-[#2bb39a] transition-all"
+                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
                 />
               </div>
 
               {/* Valor */}
               <div className="flex flex-col gap-2">
-                <label className="text-[#bfe9df] text-xs font-semibold tracking-widest uppercase">Valor</label>
+                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Valor</label>
                 <div className="flex items-center gap-2">
-                  <span className="text-[#2bb39a] font-bold text-sm px-3 h-[42px] flex items-center rounded-xl bg-white/10 border border-white/20">
+                  <span className="text-c-accent font-bold text-sm px-3 h-[42px] flex items-center rounded-xl bg-c-bg border border-c-border">
                     R$
                   </span>
                   <input
@@ -363,22 +363,22 @@ const Gastos = () => {
                     placeholder="0,00"
                     value={form.valor}
                     onChange={(e) => setForm({ ...form, valor: e.target.value })}
-                    className="flex-1 h-[42px] px-4 rounded-xl bg-white/10 border border-white/20 text-white text-sm placeholder-white/30 outline-none focus:border-[#2bb39a] transition-all"
+                    className="flex-1 h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
                   />
                 </div>
-                {erros.valor && <p className="text-[#e24b4b] text-xs">{erros.valor}</p>}
+                {erros.valor && <p className="text-c-negative text-xs">{erros.valor}</p>}
               </div>
 
               {/* Data */}
               <div className="flex flex-col gap-2">
-                <label className="text-[#bfe9df] text-xs font-semibold tracking-widest uppercase">Data</label>
+                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">Data</label>
                 <input
                   type="date"
                   value={form.data}
                   onChange={(e) => setForm({ ...form, data: e.target.value })}
-                  className="w-full h-[42px] px-4 rounded-xl bg-white/10 border border-white/20 text-white text-sm outline-none focus:border-[#2bb39a] transition-all"
+                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
                 />
-                {erros.data && <p className="text-[#e24b4b] text-xs">{erros.data}</p>}
+                {erros.data && <p className="text-c-negative text-xs">{erros.data}</p>}
               </div>
 
               {/* Botões */}
@@ -386,14 +386,14 @@ const Gastos = () => {
                 <button
                   type="submit"
                   disabled={salvando}
-                  className="flex-1 h-[42px] bg-[#2bb39a] text-white text-sm font-bold rounded-xl tracking-widest hover:bg-[#3a4f4b] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-none"
+                  className="flex-1 h-[42px] bg-c-accent text-white text-sm font-bold rounded-xl tracking-widest hover:opacity-85 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-none"
                 >
                   {salvando ? 'SALVANDO...' : editando ? 'SALVAR' : 'CRIAR'}
                 </button>
                 <button
                   type="button"
                   onClick={fecharModal}
-                  className="flex-1 h-[42px] bg-white/10 text-white/70 text-sm font-semibold rounded-xl hover:bg-white/20 transition-all cursor-pointer border-none"
+                  className="flex-1 h-[42px] bg-c-bg text-c-text/60 text-sm font-semibold rounded-xl border border-c-border hover:text-c-text hover:border-c-text/30 transition-all cursor-pointer"
                 >
                   CANCELAR
                 </button>

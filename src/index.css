@@ -1,5 +1,44 @@
 @import "tailwindcss";
 
+/* ─── Tema escuro (padrão) ────────────────────────────────────────────────── */
+:root {
+  --color-c-bg:        #090d16;
+  --color-c-header:    #0c1220;
+  --color-c-surface:   #111827;
+  --color-c-surface-2: #1a2235;
+  --color-c-accent:    #38bdf8;
+  --color-c-positive:  #34d399;
+  --color-c-negative:  #f87171;
+  --color-c-text:      #e2e8f0;
+  --color-c-border:    #1e293b;
+}
+
+/* ─── Tema claro ──────────────────────────────────────────────────────────── */
+.theme-light {
+  --color-c-bg:        #f1f5f9;
+  --color-c-header:    #ffffff;
+  --color-c-surface:   #ffffff;
+  --color-c-surface-2: #f8fafc;
+  --color-c-accent:    #0284c7;
+  --color-c-positive:  #059669;
+  --color-c-negative:  #dc2626;
+  --color-c-text:      #0f172a;
+  --color-c-border:    #e2e8f0;
+}
+
+/* ─── Registro dos tokens no Tailwind v4 ─────────────────────────────────── */
+@theme inline {
+  --color-c-bg:        var(--color-c-bg);
+  --color-c-header:    var(--color-c-header);
+  --color-c-surface:   var(--color-c-surface);
+  --color-c-surface-2: var(--color-c-surface-2);
+  --color-c-accent:    var(--color-c-accent);
+  --color-c-positive:  var(--color-c-positive);
+  --color-c-negative:  var(--color-c-negative);
+  --color-c-text:      var(--color-c-text);
+  --color-c-border:    var(--color-c-border);
+}
+
 @layer base {
   *,
   *::before,
@@ -16,6 +55,8 @@
   body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     min-height: 100vh;
+    background-color: var(--color-c-bg);
+    color: var(--color-c-text);
   }
 
   input,
@@ -25,5 +66,17 @@
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
+  }
+
+  /* Placeholder adaptado ao tema */
+  input::placeholder,
+  textarea::placeholder {
+    color: color-mix(in srgb, var(--color-c-text) 35%, transparent);
+  }
+
+  /* Select options herdam o surface do tema */
+  option {
+    background-color: var(--color-c-surface-2);
+    color: var(--color-c-text);
   }
 }

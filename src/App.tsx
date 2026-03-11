@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 
+import { ThemeProvider } from './context/ThemeContext';
 import Login from './components/login/Login';
 import Cadastro from './components/cadastro/Cadastro';
 import PrivateRoute from './components/PrivateRoute';
@@ -11,6 +12,7 @@ import TelaPlaceholder from './components/tela-placeholder/TelaPlaceholder';
 
 function App() {
   return (
+    <ThemeProvider>
     <BrowserRouter>
       <Routes>
         {/* Rotas públicas */}
@@ -32,6 +34,7 @@ function App() {
         <Route path="*" element={<TelaPlaceholder mensagem="Página não encontrada." />} />
       </Routes>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
