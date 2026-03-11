@@ -8,6 +8,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Layout from './components/Layout';
 import Geral from './components/geral/Geral';
 import Gastos from './components/gastos/Gastos';
+import Saldo from './components/saldo/Saldo';
 import TelaPlaceholder from './components/tela-placeholder/TelaPlaceholder';
 import Calculadora from './components/investimentos/Calculadora';
 
@@ -25,7 +26,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/geral" element={<Geral />} />
             <Route path="/gastos" element={<Gastos />} />
-            <Route path="/saldo" element={<TelaPlaceholder mensagem="Tela de saldo em construção..." />} />
+            <Route path="/saldo" element={<Saldo />} />
             <Route path="/investimentos" element={<Calculadora />} />
             <Route path="/calendario" element={<TelaPlaceholder mensagem="Tela de calendário em construção..." />} />
           </Route>

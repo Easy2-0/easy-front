@@ -153,19 +153,19 @@ interface StepperProps {
 
 const Stepper = ({ label, unit, value, min, max, step = 1, onChange }: StepperProps) => (
   <div className="flex flex-col gap-2 flex-1">
-    <span className="text-white/40 text-xs font-semibold tracking-widest uppercase">{label}</span>
+    <span className="text-c-text/40 text-xs font-semibold tracking-widest uppercase">{label}</span>
     <div className="flex items-center gap-2">
       <button
         onClick={() => onChange(Math.max(min, value - step))}
-        className="w-11 h-11 rounded-xl bg-white/10 border border-white/20 text-white text-xl font-bold flex items-center justify-center active:bg-white/20 transition-all cursor-pointer shrink-0"
+        className="w-11 h-11 rounded-xl bg-c-surface border border-c-border text-c-text text-xl font-bold flex items-center justify-center active:bg-c-surface/80 transition-all cursor-pointer shrink-0"
       >−</button>
-      <div className="flex-1 h-11 bg-white/10 border border-white/20 rounded-xl flex items-center justify-center">
-        <span className="text-white font-bold text-base">{value}</span>
-        <span className="text-white/40 text-xs ml-1">{unit}</span>
+      <div className="flex-1 h-11 bg-c-surface border border-c-border rounded-xl flex items-center justify-center">
+        <span className="text-c-text font-bold text-base">{value}</span>
+        <span className="text-c-text/40 text-xs ml-1">{unit}</span>
       </div>
       <button
         onClick={() => onChange(Math.min(max, value + step))}
-        className="w-11 h-11 rounded-xl bg-white/10 border border-white/20 text-white text-xl font-bold flex items-center justify-center active:bg-white/20 transition-all cursor-pointer shrink-0"
+        className="w-11 h-11 rounded-xl bg-c-surface border border-c-border text-c-text text-xl font-bold flex items-center justify-center active:bg-c-surface/80 transition-all cursor-pointer shrink-0"
       >+</button>
     </div>
   </div>
@@ -178,12 +178,12 @@ const Stepper = ({ label, unit, value, min, max, step = 1, onChange }: StepperPr
 const TooltipCustom = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#1e3d3a] border border-white/20 rounded-xl px-4 py-3 shadow-xl min-w-[160px]">
-      <p className="text-white/50 text-xs mb-2 font-semibold">{label}</p>
+    <div className="bg-c-surface border border-c-border rounded-xl px-4 py-3 shadow-xl min-w-[160px]">
+      <p className="text-c-text/50 text-xs mb-2 font-semibold">{label}</p>
       {payload.map((p: any) => (
         <p key={p.name} className="flex justify-between gap-4 py-0.5">
           <span style={{ color: p.color }} className="text-xs">{p.name}</span>
-          <span className="text-white font-bold text-xs">{fmt(p.value)}</span>
+          <span className="text-c-text font-bold text-xs">{fmt(p.value)}</span>
         </p>
       ))}
     </div>
@@ -241,25 +241,25 @@ const Calculadora = () => {
 
       {/* Título */}
       <div>
-        <h1 className="text-white text-xl font-bold">Calculadora</h1>
-        <p className="text-white/40 text-sm mt-0.5">Simule o rendimento líquido dos seus investimentos</p>
+        <h1 className="text-c-text text-xl font-bold">Calculadora</h1>
+        <p className="text-c-text/40 text-sm mt-0.5">Simule o rendimento líquido dos seus investimentos</p>
       </div>
 
       {/* ── SEÇÃO 1: VALORES ─────────────────────────────────────────── */}
-      <div className="bg-white/10 border border-white/20 rounded-2xl p-5 flex flex-col gap-4">
-        <p className="text-white/40 text-xs font-semibold tracking-widest uppercase">Valores</p>
+      <div className="bg-c-surface border border-c-border rounded-2xl p-5 flex flex-col gap-4">
+        <p className="text-c-text/40 text-xs font-semibold tracking-widest uppercase">Valores</p>
 
         <div className="grid grid-cols-2 gap-3">
           {/* Valor inicial */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[#bfe9df] text-xs font-semibold tracking-widest uppercase">Inicial</label>
-            <div className="flex h-12 rounded-xl overflow-hidden border border-white/20 bg-white/10">
-              <span className="px-3 flex items-center text-[#2bb39a] font-bold text-sm bg-white/5 border-r border-white/10 shrink-0">R$</span>
+            <label className="text-c-positive text-xs font-semibold tracking-widest uppercase">Inicial</label>
+            <div className="flex h-12 rounded-xl overflow-hidden border border-c-border bg-c-surface">
+              <span className="px-3 flex items-center text-c-positive font-bold text-sm bg-c-surface border-r border-c-border shrink-0">R$</span>
               <input
                 type="number" inputMode="decimal" min="0" step="100"
                 value={valorInicial}
                 onChange={(e) => setValorInicial(e.target.value)}
-                className="flex-1 min-w-0 px-3 bg-transparent text-white text-sm outline-none"
+                className="flex-1 min-w-0 px-3 bg-transparent text-c-text text-sm outline-none"
                 placeholder="0"
               />
             </div>
@@ -267,14 +267,14 @@ const Calculadora = () => {
 
           {/* Aporte mensal */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[#bfe9df] text-xs font-semibold tracking-widest uppercase">Mensal</label>
-            <div className="flex h-12 rounded-xl overflow-hidden border border-white/20 bg-white/10">
-              <span className="px-3 flex items-center text-[#2bb39a] font-bold text-sm bg-white/5 border-r border-white/10 shrink-0">R$</span>
+            <label className="text-c-positive text-xs font-semibold tracking-widest uppercase">Mensal</label>
+            <div className="flex h-12 rounded-xl overflow-hidden border border-c-border bg-c-surface">
+              <span className="px-3 flex items-center text-c-positive font-bold text-sm bg-c-surface border-r border-c-border shrink-0">R$</span>
               <input
                 type="number" inputMode="decimal" min="0" step="50"
                 value={aporteMensal}
                 onChange={(e) => setAporteMensal(e.target.value)}
-                className="flex-1 min-w-0 px-3 bg-transparent text-white text-sm outline-none"
+                className="flex-1 min-w-0 px-3 bg-transparent text-c-text text-sm outline-none"
                 placeholder="0"
               />
             </div>
@@ -283,10 +283,10 @@ const Calculadora = () => {
       </div>
 
       {/* ── SEÇÃO 2: PERÍODO ─────────────────────────────────────────── */}
-      <div className="bg-white/10 border border-white/20 rounded-2xl p-5 flex flex-col gap-4">
+      <div className="bg-c-surface border border-c-border rounded-2xl p-5 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <p className="text-white/40 text-xs font-semibold tracking-widest uppercase">Período</p>
-          <span className="text-[#2bb39a] text-sm font-bold">{labelPeriodo()} · {totalMeses}m</span>
+          <p className="text-c-text/40 text-xs font-semibold tracking-widest uppercase">Período</p>
+          <span className="text-c-positive text-sm font-bold">{labelPeriodo()} · {totalMeses}m</span>
         </div>
 
         {/* Steppers lado a lado */}
@@ -305,8 +305,8 @@ const Calculadora = () => {
                 onClick={() => { setAnos(a.anos); setMesesExtra(a.meses); }}
                 className={`shrink-0 h-9 px-4 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                   ativo
-                    ? 'bg-[#2bb39a] border-[#2bb39a] text-white'
-                    : 'bg-white/5 border-white/10 text-white/50 active:bg-white/10'
+                    ? 'bg-c-positive border-c-positive text-c-bg'
+                    : 'bg-c-surface border-c-border text-c-text/50 active:bg-c-surface'
                 }`}
               >
                 {a.label}
@@ -318,7 +318,7 @@ const Calculadora = () => {
 
       {/* ── SEÇÃO 3: TIPO DE INVESTIMENTO ────────────────────────────── */}
       <div className="flex flex-col gap-3">
-        <p className="text-white/40 text-xs font-semibold tracking-widest uppercase px-1">Tipo de investimento</p>
+        <p className="text-c-text/40 text-xs font-semibold tracking-widest uppercase px-1">Tipo de investimento</p>
 
         {/* Cards em scroll horizontal */}
         <div className="flex gap-3 overflow-x-auto -mx-1 px-1 scroll-thin mt-2">
@@ -332,12 +332,12 @@ const Calculadora = () => {
                 style={
                   ativo
                     ? { backgroundColor: `${t.cor}20`, borderColor: t.cor }
-                    : { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)' }
+                    : { backgroundColor: 'var(--color-c-surface)', borderColor: 'var(--color-c-border)' }
                 }
               >
                 <span className="text-xl leading-none">{t.emoji}</span>
-                <span className="text-white text-sm font-bold mt-1 leading-tight">{t.label}</span>
-                <span className="text-xs font-semibold" style={{ color: ativo ? t.cor : 'rgba(255,255,255,0.4)' }}>
+                <span className="text-c-text text-sm font-bold mt-1 leading-tight">{t.label}</span>
+                <span className="text-xs font-semibold" style={{ color: ativo ? t.cor : 'var(--color-c-text-40)' }}>
                   {t.descricaoCurta}
                 </span>
                 <span
@@ -345,7 +345,7 @@ const Calculadora = () => {
                   style={
                     ativo
                       ? { backgroundColor: `${t.cor}30`, color: t.cor }
-                      : { backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.35)' }
+                      : { backgroundColor: 'var(--color-c-surface)', color: 'var(--color-c-text-35)' }
                   }
                 >
                   {t.irBadge}
@@ -364,10 +364,10 @@ const Calculadora = () => {
         {/* Valor final em destaque */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-white/50 text-xs font-semibold tracking-widest uppercase mb-1">
+            <p className="text-c-text/50 text-xs font-semibold tracking-widest uppercase mb-1">
               Valor final líquido · {tipo.label}
             </p>
-            <p className="text-white text-3xl sm:text-4xl font-black leading-none">
+            <p className="text-c-text text-3xl sm:text-4xl font-black leading-none">
               {fmt(res.totalLiquido)}
             </p>
             <p className="mt-2 text-sm font-semibold" style={{ color: tipo.cor }}>
@@ -378,23 +378,23 @@ const Calculadora = () => {
         </div>
 
         {/* Divisor */}
-        <div className="h-px bg-white/10" />
+        <div className="h-px border-t border-c-border" />
 
         {/* 3 métricas secundárias */}
         <div className="grid grid-cols-3 gap-3">
           <div className="flex flex-col gap-0.5">
-            <span className="text-white/40 text-[10px] font-semibold uppercase tracking-wide">Aportado</span>
-            <span className="text-white font-bold text-sm">{fmt(res.aportado)}</span>
+            <span className="text-c-text/40 text-[10px] font-semibold uppercase tracking-wide">Aportado</span>
+            <span className="text-c-text font-bold text-sm">{fmt(res.aportado)}</span>
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-white/40 text-[10px] font-semibold uppercase tracking-wide">Rendimento</span>
+            <span className="text-c-text/40 text-[10px] font-semibold uppercase tracking-wide">Rendimento</span>
             <span className="font-bold text-sm" style={{ color: tipo.cor }}>+{fmt(res.rendLiquido)}</span>
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-white/40 text-[10px] font-semibold uppercase tracking-wide">
+            <span className="text-c-text/40 text-[10px] font-semibold uppercase tracking-wide">
               {res.ir === 0 ? 'IR' : tipo.id !== 'acoes' ? aliquotaLabel(totalMeses) : 'IR 15%'}
             </span>
-            <span className="text-[#e24b4b] font-bold text-sm">
+            <span className="text-c-negative font-bold text-sm">
               {res.ir === 0 ? 'Isento' : `−${fmt(res.ir)}`}
             </span>
           </div>
@@ -402,10 +402,10 @@ const Calculadora = () => {
       </div>
 
       {/* ── SEÇÃO 5: GRÁFICO ─────────────────────────────────────────── */}
-      <div className="bg-white/10 border border-white/20 rounded-2xl p-5 flex flex-col gap-4">
+      <div className="bg-c-surface border border-c-border rounded-2xl p-5 flex flex-col gap-4">
         <div>
-          <p className="text-white font-semibold text-sm">Evolução do patrimônio</p>
-          <p className="text-white/40 text-xs mt-0.5">Aportado vs. valor líquido ao longo do tempo</p>
+          <p className="text-c-text font-semibold text-sm">Evolução do patrimônio</p>
+          <p className="text-c-text/40 text-xs mt-0.5">Aportado vs. valor líquido ao longo do tempo</p>
         </div>
 
         <ResponsiveContainer width="100%" height={200}>
@@ -416,15 +416,15 @@ const Calculadora = () => {
                 <stop offset="95%" stopColor={tipo.cor} stopOpacity={0} />
               </linearGradient>
               <linearGradient id="gAp" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="rgba(255,255,255,0.08)" />
-                <stop offset="95%" stopColor="rgba(255,255,255,0)" />
+                <stop offset="5%" stopColor="var(--color-c-text)" stopOpacity={0.08} />
+                <stop offset="95%" stopColor="var(--color-c-text)" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="label" tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-c-border)" />
+            <XAxis dataKey="label" tick={{ fill: 'var(--color-c-text)', fontSize: 9, opacity: 0.3 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+            <YAxis tick={{ fill: 'var(--color-c-text)', fontSize: 9, opacity: 0.3 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
             <Tooltip content={<TooltipCustom />} />
-            <Area type="monotone" dataKey="aportado" name="Aportado" stroke="rgba(255,255,255,0.2)" fill="url(#gAp)" strokeWidth={1.5} dot={false} />
+            <Area type="monotone" dataKey="aportado" name="Aportado" stroke="var(--color-c-text)" fill="url(#gAp)" strokeWidth={1.5} dot={false} opacity={0.2} />
             <Area type="monotone" dataKey="liquido" name="Líquido" stroke={tipo.cor} fill="url(#gLiq)" strokeWidth={2.5} dot={false} />
           </AreaChart>
         </ResponsiveContainer>
@@ -432,21 +432,21 @@ const Calculadora = () => {
         {/* Legenda manual (mais legível no mobile) */}
         <div className="flex gap-4 justify-center">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-0.5 rounded-full bg-white/30" />
-            <span className="text-white/40 text-xs">Aportado</span>
+            <div className="w-3 h-0.5 rounded-full bg-c-text/30" />
+            <span className="text-c-text/40 text-xs">Aportado</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-0.5 rounded-full" style={{ backgroundColor: tipo.cor }} />
-            <span className="text-white/60 text-xs">Líquido após IR</span>
+            <span className="text-c-text/60 text-xs">Líquido após IR</span>
           </div>
         </div>
       </div>
 
       {/* ── SEÇÃO 6: COMPARATIVO ─────────────────────────────────────── */}
-      <div className="bg-white/10 border border-white/20 rounded-2xl p-5 flex flex-col gap-3">
+      <div className="bg-c-surface border border-c-border rounded-2xl p-5 flex flex-col gap-3">
         <div>
-          <p className="text-white font-semibold text-sm">Comparativo líquido</p>
-          <p className="text-white/40 text-xs mt-0.5">Toque para selecionar e ver no gráfico</p>
+          <p className="text-c-text font-semibold text-sm">Comparativo líquido</p>
+          <p className="text-c-text/40 text-xs mt-0.5">Toque para selecionar e ver no gráfico</p>
         </div>
 
         <div className="flex flex-col gap-2">
@@ -459,13 +459,13 @@ const Calculadora = () => {
                 key={t.id}
                 onClick={() => setTipoId(t.id)}
                 className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer active:scale-[0.98] ${
-                  ativo ? 'border-white/30 bg-white/10' : 'border-transparent bg-white/5'
+                  ativo ? 'border-c-border bg-c-surface' : 'border-transparent bg-c-surface/50'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-base leading-none">{t.emoji}</span>
-                    <span className="text-white/80 text-sm font-semibold">{t.label}</span>
+                    <span className="text-c-text/80 text-sm font-semibold">{t.label}</span>
                     {i === 0 && (
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md" style={{ backgroundColor: `${t.cor}30`, color: t.cor }}>
                         MELHOR
@@ -473,19 +473,19 @@ const Calculadora = () => {
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-white font-bold text-sm">{fmt(t.totalLiquido)}</p>
+                    <p className="text-c-text font-bold text-sm">{fmt(t.totalLiquido)}</p>
                     {t.ir > 0 && (
-                      <p className="text-[#e24b4b]/60 text-[10px]">IR −{fmt(t.ir)}</p>
+                      <p className="text-c-negative/60 text-[10px]">IR −{fmt(t.ir)}</p>
                     )}
                   </div>
                 </div>
-                <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-c-border rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-700"
                     style={{ width: `${pct}%`, backgroundColor: t.cor }}
                   />
                 </div>
-                <p className="text-white/25 text-[10px] mt-1.5">{t.irInfo}</p>
+                <p className="text-c-text/25 text-[10px] mt-1.5">{t.irInfo}</p>
               </button>
             );
           })}
