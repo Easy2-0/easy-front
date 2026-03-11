@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+/* Scrollbar minimalista e arredondada — fora do @layer para não ser sobrescrita */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-c-text) 15%, transparent);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-c-text) 30%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-c-text) 15%, transparent) transparent;
+}
+
 /* ─── Tema escuro (padrão) ────────────────────────────────────────────────── */
 :root {
   --color-c-bg:        #090d16;
@@ -79,4 +103,5 @@
     background-color: var(--color-c-surface-2);
     color: var(--color-c-text);
   }
+
 }

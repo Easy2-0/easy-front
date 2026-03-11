@@ -1,9 +1,23 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBalance } from '../../context/BalanceContext';
+import { transacaoService } from '../../services/transacaoService';
+import { usuarioService } from '../../services/usuarioService';
 
 const Geral = () => {
   const navigate = useNavigate();
-  const { entrada, saida, saldo } = useBalance();
+  const { entrada, saida, saldo, setEntrada, setSaida } = useBalance();
+  const usuario = usuarioService.getUsuarioLogado();
+
+  useEffect(() => {
+    transacaoService.buscarTodas().then((todas) => {
+      const filtradas = usuario ? todas.filter((t) => t.usuario?.id === usuario.id) : todas;
+      const entradas = filtradas.filter((t) => t.tipo === 'Receita').reduce((s, t) => s + t.valor, 0);
+      const saidas = filtradas.filter((t) => t.tipo === 'Despesa').reduce((s, t) => s + t.valor, 0);
+      setEntrada(entradas);
+      setSaida(saidas);
+    }).catch(() => {});
+  }, []);
 
   const formatarValor = (valor: number) =>
     valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

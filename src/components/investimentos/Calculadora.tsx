@@ -296,7 +296,7 @@ const Calculadora = () => {
         </div>
 
         {/* Atalhos — scroll horizontal */}
-        <div className="flex gap-2 overflow-x-auto -mx-1 px-1 scroll-thin mt-2">
+        <div className="flex gap-2 overflow-x-auto overflow-y-hidden -mx-1 px-1 pb-2 mt-2">
           {ATALHOS.map((a) => {
             const ativo = anos === a.anos && mesesExtra === a.meses;
             return (
@@ -321,7 +321,7 @@ const Calculadora = () => {
         <p className="text-c-text/40 text-xs font-semibold tracking-widest uppercase px-1">Tipo de investimento</p>
 
         {/* Cards em scroll horizontal */}
-        <div className="flex gap-3 overflow-x-auto -mx-1 px-1 scroll-thin mt-2">
+        <div className="flex gap-3 overflow-x-auto overflow-y-hidden -mx-1 px-1 pb-2 mt-2">
           {TIPOS.map((t) => {
             const ativo = tipoId === t.id;
             return (

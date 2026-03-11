@@ -7,6 +7,7 @@ export interface Transacao {
   valor: number;
   data: string;
   descricao: string;
+  categoriaId?: number;
   usuario: {
     id: number;
   };
@@ -18,4 +19,5 @@ export interface TransacaoForm {
   valor: number;
   data: string;
   descricao: string;
+  categoriaId?: number;
 }

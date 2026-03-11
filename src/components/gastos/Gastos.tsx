@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useBalance } from '../../context/BalanceContext';
 import { transacaoService } from '../../services/transacaoService';
+import { categoriaService } from '../../services/categoriaService';
 import { usuarioService } from '../../services/usuarioService';
-import type { Transacao, TransacaoForm, TipoTransacao } from '../../models';
+import type { Transacao, TransacaoForm, TipoTransacao, Categoria } from '../../models';
 
 // ---------------------------------------------------------------------------
 // Tipos internos
@@ -14,6 +15,7 @@ interface FormState {
   descricao: string;
   valor: string;
   data: string;
+  categoriaId: string;
 }
 
 interface FormErros {
@@ -28,6 +30,7 @@ const FORM_INICIAL: FormState = {
   descricao: '',
   valor: '',
   data: new Date().toISOString().split('T')[0],
+  categoriaId: '',
 };
 
 // ---------------------------------------------------------------------------
@@ -56,6 +59,7 @@ const Gastos = () => {
   const usuario = usuarioService.getUsuarioLogado();
 
   const [movimentos, setMovimentos] = useState<Transacao[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState<Transacao | null>(null);
@@ -69,6 +73,7 @@ const Gastos = () => {
 
   useEffect(() => {
     carregarTransacoes();
+    categoriaService.buscarTodas().then(setCategorias).catch(() => {});
   }, []);
 
   const carregarTransacoes = async () => {
@@ -117,6 +122,7 @@ const Gastos = () => {
       descricao: transacao.descricao,
       valor: String(transacao.valor),
       data: transacao.data,
+      categoriaId: transacao.categoriaId ? String(transacao.categoriaId) : '',
     });
     setErros({});
     setMostrarModal(true);
@@ -146,6 +152,7 @@ const Gastos = () => {
       descricao: form.descricao,
       valor: Number(form.valor),
       data: form.data,
+      ...(form.categoriaId ? { categoriaId: Number(form.categoriaId) } : {}),
     };
 
     setSalvando(true);
@@ -347,6 +354,25 @@ const Gastos = () => {
                   onChange={(e) => setForm({ ...form, descricao: e.target.value })}
                   className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
                 />
+              </div>
+
+              {/* Categoria */}
+              <div className="flex flex-col gap-2">
+                <label className="text-c-text/60 text-xs font-semibold tracking-widest uppercase">
+                  Categoria <span className="normal-case text-c-text/30 tracking-normal font-normal">(opcional)</span>
+                </label>
+                <select
+                  value={form.categoriaId}
+                  onChange={(e) => setForm({ ...form, categoriaId: e.target.value })}
+                  className="w-full h-[42px] px-4 rounded-xl bg-c-bg border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all cursor-pointer"
+                >
+                  <option value="">Sem categoria</option>
+                  {categorias.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.nome}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Valor */}
