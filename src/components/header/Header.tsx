@@ -5,6 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 
 const navItems = [
   { label: 'Geral', rota: '/geral' },
+  { label: 'Metas', rota: '/metas' },
   { label: 'Saldo', rota: '/saldo' },
   { label: 'Transações', rota: '/gastos' },
   { label: 'Investimentos', rota: '/investimentos' },

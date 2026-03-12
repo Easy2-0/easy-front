@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer,
 } from 'recharts';
+import { usePortfolio } from '../../context/PortfolioContext';
 
 interface Moeda {
   id: string;
@@ -29,12 +30,24 @@ const CONFIG_MOEDAS = [
 ];
 
 const Cripto = () => {
+  const { criptos, adicionarCripto } = usePortfolio();
   const [moedas, setMoedas] = useState<Moeda[]>([]);
   const [busca, setBusca] = useState('');
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(false);
   const [ultimaAtualizacao, setUltimaAtualizacao] = useState<Date>(new Date());
   const [expandida, setExpandida] = useState<string | null>(null);
+
+  // Estado para edição de quantidade na carteira
+  const [editandoQtd, setEditandoQtd] = useState<string>('');
+
+  // Cálculo do saldo total da carteira em BRL
+  const saldoTotalBrl = useMemo(() => {
+    return criptos.reduce((total, p) => {
+      const moeda = moedas.find(m => m.id === p.id);
+      return total + (moeda ? moeda.precoBrl * p.quantidade : 0);
+    }, 0);
+  }, [criptos, moedas]);
 
   const buscarPrecos = async () => {
     try {
@@ -47,12 +60,10 @@ const Cripto = () => {
             order: 'market_cap_desc',
             sparkline: true,
             price_change_percentage: '24h',
-            // Adicionamos USD como moeda secundária via conversão simples ou parâmetro extra se suportado
           }
         }
       );
 
-      // Buscamos o preço em USD separadamente para precisão
       const usdResponse = await axios.get(
         `https://api.coingecko.com/api/v3/simple/price`, {
           params: { ids: ids, vs_currencies: 'usd' }
@@ -74,12 +85,8 @@ const Cripto = () => {
           logo: item.image,
           cor: CONFIG_MOEDAS.find(c => c.id === item.id)?.cor || '#888',
           sparkline: prices.map((p: number, i: number) => {
-            // Cada ponto representa aproximadamente 1 hora de intervalo
             const dataPonto = new Date(agora.getTime() - (totalPontos - 1 - i) * 3600000);
-            return {
-              valor: p,
-              timestamp: dataPonto
-            };
+            return { valor: p, timestamp: dataPonto };
           })
         };
       });
@@ -101,6 +108,14 @@ const Cripto = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleSalvarQtd = (id: string) => {
+    const qtd = parseFloat(editandoQtd);
+    if (!isNaN(qtd)) {
+      adicionarCripto(id, qtd);
+      setExpandida(null); // Fecha após salvar
+    }
+  };
+
   const moedasFiltradas = moedas.filter(m => 
     m.nome.toLowerCase().includes(busca.toLowerCase()) || 
     m.sigla.toLowerCase().includes(busca.toLowerCase())
@@ -115,11 +130,21 @@ const Cripto = () => {
   return (
     <div className="flex flex-col gap-6 pb-10">
       
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
+      {/* Hero da Carteira Real */}
+      <div className="bg-c-accent rounded-3xl p-6 text-white shadow-xl shadow-c-accent/20 overflow-hidden relative group">
+        <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
+        <p className="text-white/60 text-xs font-bold tracking-widest uppercase mb-1">Patrimônio em Cripto</p>
+        <h2 className="text-3xl font-black">{formatarBrl(saldoTotalBrl)}</h2>
+        <div className="flex items-center gap-2 mt-4">
+          <span className="text-[10px] bg-white/20 px-2 py-1 rounded-lg font-bold">LIVE 2026</span>
+          <p className="text-white/40 text-[10px] font-bold uppercase tracking-tighter">Dados em tempo real</p>
+        </div>
+      </div>
+
+      {/* Header secundário */}
+      <div className="flex items-center justify-between gap-4 px-1">
         <div>
-          <h1 className="text-c-text text-xl font-bold">Mercado Cripto</h1>
-          <p className="text-c-text/50 text-sm mt-1">Cotações ao vivo via CoinGecko</p>
+          <h1 className="text-c-text text-lg font-bold">Mercado</h1>
         </div>
         <div className="text-right">
           <span className="text-[10px] text-c-text/30 font-bold uppercase tracking-widest block">Última atualização</span>
@@ -131,12 +156,18 @@ const Cripto = () => {
       <div className="relative">
         <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-c-text/30" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
         <input 
-          type="text" placeholder="Buscar moeda..." value={busca} onChange={(e) => setBusca(e.target.value)}
+          type="text" placeholder="Buscar moeda no mercado..." value={busca} onChange={(e) => setBusca(e.target.value)}
           className="w-full h-12 pl-12 pr-4 rounded-2xl bg-c-surface border border-c-border text-c-text text-sm outline-none focus:border-c-accent transition-all"
         />
       </div>
 
-      {/* Carregando/Erro omitidos para brevidade se não mudarem drasticamente */}
+      {erro && (
+        <div className="p-4 rounded-2xl bg-c-negative/10 border border-c-negative/20 text-c-negative text-center">
+          <p className="text-sm font-bold">Erro ao carregar dados.</p>
+          <button onClick={buscarPrecos} className="mt-2 text-xs underline font-bold cursor-pointer bg-transparent border-none text-c-negative">Tentar agora</button>
+        </div>
+      )}
+
       {carregando && moedas.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
           <div className="w-8 h-8 border-4 border-c-accent/20 border-t-c-accent rounded-full animate-spin" />
@@ -148,10 +179,20 @@ const Cripto = () => {
       <div className="flex flex-col gap-3">
         {moedasFiltradas.map((moeda) => {
           const isExp = expandida === moeda.id;
+          const posicao = criptos.find(p => p.id === moeda.id);
+          const valorEmCarteira = posicao ? moeda.precoBrl * posicao.quantidade : 0;
+
           return (
             <div 
               key={moeda.id}
-              onClick={() => setExpandida(isExp ? null : moeda.id)}
+              onClick={() => {
+                if (expandida !== moeda.id) {
+                    setExpandida(moeda.id);
+                    setEditandoQtd(posicao ? String(posicao.quantidade) : '');
+                } else {
+                    setExpandida(null);
+                }
+              }}
               className={`flex flex-col overflow-hidden rounded-2xl bg-c-surface border transition-all duration-300 cursor-pointer ${
                 isExp ? 'border-c-accent/40 shadow-xl' : 'border-c-border hover:border-c-text/20'
               }`}
@@ -163,13 +204,25 @@ const Cripto = () => {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-c-text font-bold text-sm tracking-wide">{moeda.nome}</span>
-                    <span className="text-c-text/40 text-[11px] font-bold uppercase tracking-widest">{moeda.sigla}</span>
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-c-text/40 text-[11px] font-bold uppercase tracking-widest">{moeda.sigla}</span>
+                        {posicao && (
+                            <span className="text-[10px] bg-c-accent/10 text-c-accent px-1.5 py-0.5 rounded font-bold">
+                                {posicao.quantidade} na carteira
+                            </span>
+                        )}
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-end">
                   <span className="text-c-text font-black text-sm">{formatarBrl(moeda.precoBrl)}</span>
-                  <span className="text-c-text/30 text-[11px] font-bold">{formatarUsd(moeda.precoUsd)}</span>
+                  {posicao && (
+                    <span className="text-c-accent font-bold text-[11px]">{formatarBrl(valorEmCarteira)}</span>
+                  )}
+                  {!posicao && (
+                    <span className="text-c-text/30 text-[11px] font-bold">{formatarUsd(moeda.precoUsd)}</span>
+                  )}
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-1 ${
                     moeda.variacao >= 0 ? 'bg-c-positive/10 text-c-positive' : 'bg-c-negative/10 text-c-negative'
                   }`}>
@@ -178,43 +231,73 @@ const Cripto = () => {
                 </div>
               </div>
 
-              {/* Gráfico Expansível */}
-              <div className={`transition-all duration-500 ease-in-out ${isExp ? 'max-h-[250px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden bg-c-surface/50`}>
-                <div className="px-4 pb-6 pt-2 h-[200px] w-full">
-                  <div className="h-px w-full bg-c-border mb-4" />
-                  <p className="text-[10px] text-c-text/40 font-bold uppercase tracking-widest mb-4">Tendência 7 dias</p>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={moeda.sparkline}>
-                      <defs>
-                        <linearGradient id={`color-${moeda.id}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={moeda.cor} stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor={moeda.cor} stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-c-border)" opacity={0.5} />
-                      <Tooltip 
-                        content={({ active, payload }) => {
-                          if (active && payload && payload.length) {
-                            const data = payload[0].payload.timestamp as Date;
-                            return (
-                              <div className="bg-c-surface border border-c-border px-3 py-2 rounded-xl shadow-2xl">
-                                <p className="text-[10px] text-c-text/40 font-bold uppercase tracking-widest mb-1">
-                                  {data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} • {data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                                <p className="text-c-text font-black text-sm">{formatarBrl(payload[0].value as number)}</p>
-                              </div>
-                            );
-                          }
-                          return null;
-                        }}
-                      />
-                      <Area 
-                        type="monotone" dataKey="valor" stroke={moeda.cor} strokeWidth={2}
-                        fillOpacity={1} fill={`url(#color-${moeda.id})`} 
-                        animationDuration={1500}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
+              {/* Painel Expansível */}
+              <div className={`transition-all duration-500 ease-in-out ${isExp ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden bg-c-surface/50`}>
+                <div className="px-4 pb-6 pt-2 w-full flex flex-col gap-6">
+                  <div className="h-px w-full bg-c-border" />
+                  
+                  {/* Gestão de Carteira */}
+                  <div className="bg-c-bg rounded-2xl p-4 border border-c-border flex flex-col gap-3" onClick={e => e.stopPropagation()}>
+                    <p className="text-[10px] text-c-text/40 font-bold uppercase tracking-widest">Sua Carteira Real</p>
+                    <div className="flex gap-2">
+                        <div className="flex-1 bg-c-surface border border-c-border rounded-xl px-3 py-2 flex items-center gap-2">
+                            <span className="text-c-text/30 text-xs font-bold">{moeda.sigla.toUpperCase()}</span>
+                            <input 
+                                type="number" step="any" placeholder="Qtd. que você possui"
+                                value={editandoQtd} onChange={e => setEditandoQtd(e.target.value)}
+                                className="bg-transparent border-none outline-none text-c-text text-sm font-bold w-full"
+                            />
+                        </div>
+                        <button 
+                            onClick={() => handleSalvarQtd(moeda.id)}
+                            className="bg-c-accent text-white px-4 rounded-xl text-xs font-bold hover:brightness-110 transition-all cursor-pointer border-none h-10"
+                        >
+                            Salvar
+                        </button>
+                    </div>
+                    {posicao && (
+                        <p className="text-[10px] text-c-text/40 italic">
+                           Saldo total nesta moeda: <span className="text-c-accent font-bold">{formatarBrl(valorEmCarteira)}</span>
+                        </p>
+                    )}
+                  </div>
+
+                  {/* Gráfico */}
+                  <div className="h-[180px] w-full">
+                    <p className="text-[10px] text-c-text/40 font-bold uppercase tracking-widest mb-4">Tendência 7 dias</p>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={moeda.sparkline}>
+                        <defs>
+                            <linearGradient id={`color-${moeda.id}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={moeda.cor} stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor={moeda.cor} stopOpacity={0}/>
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-c-border)" opacity={0.5} />
+                        <Tooltip 
+                            content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                                const data = payload[0].payload.timestamp as Date;
+                                return (
+                                <div className="bg-c-surface border border-c-border px-3 py-2 rounded-xl shadow-2xl">
+                                    <p className="text-[10px] text-c-text/40 font-bold uppercase tracking-widest mb-1">
+                                    {data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} • {data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                    </p>
+                                    <p className="text-c-text font-black text-sm">{formatarBrl(payload[0].value as number)}</p>
+                                </div>
+                                );
+                            }
+                            return null;
+                            }}
+                        />
+                        <Area 
+                            type="monotone" dataKey="valor" stroke={moeda.cor} strokeWidth={2}
+                            fillOpacity={1} fill={`url(#color-${moeda.id})`} 
+                            animationDuration={1500}
+                        />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
               </div>
             </div>
