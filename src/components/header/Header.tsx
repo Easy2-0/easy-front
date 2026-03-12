@@ -62,29 +62,37 @@ const Header = () => {
       <header className="w-full bg-c-header border-b border-c-border">
 
         {/* Barra principal */}
-        <div className="px-6 py-3 flex items-center justify-between">
+        <div className="pl-0 pr-3 sm:pr-4 md:pr-6 py-1 flex items-center justify-between">
 
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-c-accent">
-              <svg width="18" height="18" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="30" cy="20" r="12" stroke="white" strokeWidth="3" fill="none" />
-                <text x="30" y="25" fontSize="16" fill="white" textAnchor="middle" fontWeight="bold">$</text>
-                <path d="M15 35 Q20 32 30 32 Q40 32 45 35 L42 45 Q35 48 30 48 Q25 48 18 45 Z" fill="white" />
-              </svg>
-            </div>
-            <span className="text-c-text font-black tracking-widest text-sm">EASY</span>
+          <div className="flex items-center shrink-0">
+            <img
+              src="/logoeasy.png"
+              alt="Easy"
+              className="w-auto object-contain h-[min(20vw,6rem)] md:h-[42px] lg:h-[54px] xl:h-[64px] 2xl:h-[74px]"
+            />
+            <span
+              className="inline font-black leading-none text-[min(5vw,1.5rem)] md:text-[13px] lg:text-[15px] xl:text-[18px] 2xl:text-xl -ml-[min(4vw,1.25rem)] md:-ml-2 lg:-ml-3 xl:-ml-4"
+              style={{
+                background: 'linear-gradient(135deg, #2563EB, #06B6D4, #34D399)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              Easy
+            </span>
           </div>
 
           {/* Navegação desktop */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-0.5 lg:gap-1">
             {navItems.map(({ label, rota }) => {
               const ativo = pathname === rota;
               return (
                 <button
                   key={rota}
                   onClick={() => navigate(rota)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer border-none
+                  className={`px-2 lg:px-4 py-2 rounded-lg text-xs lg:text-sm font-medium transition-all duration-200 cursor-pointer border-none
                     ${ativo
                       ? 'bg-c-accent text-white'
                       : 'text-c-text/60 hover:text-c-text hover:bg-c-text/10'
@@ -101,14 +109,14 @@ const Header = () => {
             <ThemeToggle />
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-c-text/60 hover:text-c-text hover:bg-c-text/10 transition-all duration-200 cursor-pointer border-none bg-transparent"
+              className="flex items-center gap-1.5 px-2 lg:px-4 py-2 rounded-lg text-xs lg:text-sm font-medium text-c-text/60 hover:text-c-text hover:bg-c-text/10 transition-all duration-200 cursor-pointer border-none bg-transparent"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
-              Sair
+              <span className="hidden lg:inline">Sair</span>
             </button>
           </div>
 
@@ -144,15 +152,19 @@ const Header = () => {
       >
         {/* Cabeçalho do drawer */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-c-border">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-c-accent">
-              <svg width="15" height="15" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="30" cy="20" r="12" stroke="white" strokeWidth="3" fill="none" />
-                <text x="30" y="25" fontSize="16" fill="white" textAnchor="middle" fontWeight="bold">$</text>
-                <path d="M15 35 Q20 32 30 32 Q40 32 45 35 L42 45 Q35 48 30 48 Q25 48 18 45 Z" fill="white" />
-              </svg>
-            </div>
-            <span className="text-c-text font-black tracking-widest text-sm">EASY</span>
+          <div className="flex items-center shrink-0">
+            <img src="/logoeasy.png" alt="Easy" className="h-8 w-auto object-contain" />
+            <span
+              className="text-lg font-black leading-none -ml-2"
+              style={{
+                background: 'linear-gradient(135deg, #2563EB, #06B6D4, #34D399)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              Easy
+            </span>
           </div>
           <button
             onClick={() => setMenuAberto(false)}

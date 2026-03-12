@@ -258,7 +258,6 @@ const Gastos = () => {
   const [erros, setErros] = useState<FormErros>({});
   const [salvando, setSalvando] = useState(false);
   const [toast, setToast] = useState<{ mensagem: string; tipo: 'erro' | 'sucesso' | 'aviso' | 'info' } | null>(null);
-  const [fabVisivel, setFabVisivel] = useState(false);
 
   // -------------------------------------------------------------------------
   // Carregar transações
@@ -267,8 +266,6 @@ const Gastos = () => {
   useEffect(() => {
     carregarTransacoes();
     categoriaService.buscarTodas().then(setCategorias).catch(() => {});
-    const t = setTimeout(() => setFabVisivel(true), 100);
-    return () => clearTimeout(t);
   }, []);
 
   const carregarTransacoes = async () => {
@@ -407,7 +404,7 @@ const Gastos = () => {
         {/* Botão Nova Transação - Redimensionado no Mobile */}
         <button
           onClick={() => abrirModal()}
-          className="flex items-center justify-center gap-1.5 sm:gap-2.5 px-3 sm:px-6 h-9 sm:h-11 rounded-xl sm:rounded-2xl bg-c-accent text-white shadow-lg shadow-c-accent/20 hover:shadow-c-accent/40 hover:brightness-110 active:scale-95 cursor-pointer border-none transition-all duration-300 shrink-0"
+          className="flex items-center justify-center gap-1.5 sm:gap-2.5 px-3 sm:px-6 h-9 sm:h-11 rounded-xl sm:rounded-2xl bg-c-accent text-white active:scale-95 cursor-pointer border-none transition-all duration-300 shrink-0"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="sm:w-[18px] sm:h-[18px]">
             <line x1="12" y1="5" x2="12" y2="19" />

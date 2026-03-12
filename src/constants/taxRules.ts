@@ -1,11 +1,13 @@
-export enum TipoInvestimentoEnum {
-  RENDA_FIXA = 'RENDA_FIXA',
-  ACOES = 'ACOES',
-  ETFS = 'ETFS',
-  FIIS = 'FIIS',
-  CRIPTO = 'CRIPTO',
-  DIVIDENDOS = 'DIVIDENDOS',
-}
+export const TipoInvestimentoEnum = {
+  RENDA_FIXA: 'RENDA_FIXA',
+  ACOES: 'ACOES',
+  ETFS: 'ETFS',
+  FIIS: 'FIIS',
+  CRIPTO: 'CRIPTO',
+  DIVIDENDOS: 'DIVIDENDOS',
+} as const;
+
+export type TipoInvestimentoEnum = typeof TipoInvestimentoEnum[keyof typeof TipoInvestimentoEnum];
 
 export interface TaxRule {
   aliquota: number;

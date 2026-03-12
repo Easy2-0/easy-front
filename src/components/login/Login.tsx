@@ -32,6 +32,21 @@ const Login = () => {
     }
   };
 
+  const handleDemoAccess = () => {
+    // Simula um login de admin/demo para o APK
+    const demoUser = {
+      id: 1,
+      nome: 'Usuário Demo',
+      email: 'demo@easy.com.br',
+      token: 'mock-token-12345'
+    };
+    localStorage.setItem('token', demoUser.token);
+    localStorage.setItem('usuario', JSON.stringify(demoUser));
+    
+    setToast({ mensagem: 'Acessando modo demonstração...', tipo: 'sucesso' });
+    setTimeout(() => navigate('/gastos'), 1000);
+  };
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-c-bg flex items-center justify-center px-6 py-6">
 
@@ -106,6 +121,22 @@ const Login = () => {
               className="w-full h-[42px] bg-c-accent text-white text-sm font-bold rounded-xl tracking-widest hover:opacity-85 hover:shadow-lg hover:shadow-c-accent/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-none"
             >
               {loading ? 'ENTRANDO...' : 'ENTRAR'}
+            </button>
+
+            {/* Divisor */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-c-border" />
+              <span className="text-c-text/20 text-[10px] font-bold uppercase tracking-widest">OU</span>
+              <div className="flex-1 h-px bg-c-border" />
+            </div>
+
+            {/* Botão Demo para APK */}
+            <button
+              type="button"
+              onClick={handleDemoAccess}
+              className="w-full h-[42px] bg-c-surface border border-c-accent/30 text-c-accent text-xs font-bold rounded-xl tracking-widest hover:bg-c-accent/10 transition-all duration-300 cursor-pointer"
+            >
+              ACESSO DEMO (APK)
             </button>
           </form>
         </div>

@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd C:/Users/PC-Emanuel/Desktop/easy-front && npm install lucide-react)",
+      "Bash(sc query:*)",
+      "Bash(powershell -Command \"Start-Process 'net' -ArgumentList 'start MySQL80' -Verb RunAs -Wait\" 2>/dev/null; echo \"done\")",
+      "Bash(cd \"C:/Users/PC-Emanuel/Desktop/easy-back\" && npx prisma db push 2>&1)",
+      "Bash(\"C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe\" -u root -e \"SELECT 1;\" 2>&1)",
+      "Bash(powershell -Command \"Start-Process 'C:\\\\\\\\Program Files\\\\\\\\MySQL\\\\\\\\MySQL Server 8.0\\\\\\\\bin\\\\\\\\mysqld.exe' -ArgumentList '--skip-grant-tables' -Verb RunAs\" 2>&1; sleep 5; echo \"started\")",
+      "Bash(sleep 4 && \"C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe\" -u root --connect-timeout=5 -e \"FLUSH PRIVILEGES; ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY ''; FLUSH PRIVILEGES;\" 2>&1)",
+      "Bash(powershell -Command \"Start-Process 'C:\\\\\\\\Program Files\\\\\\\\MySQL\\\\\\\\MySQL Server 8.0\\\\\\\\bin\\\\\\\\mysqld.exe' -ArgumentList '--init-file=C:\\\\\\\\Users\\\\\\\\PC-Emanuel\\\\\\\\Desktop\\\\\\\\reset_pw.sql' -Verb RunAs\" 2>&1; sleep 6; echo \"started\")",
+      "Bash(sleep 5 && \"C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe\" -u root --connect-timeout=5 -e \"SELECT 'ok';\" 2>&1)",
+      "Bash(powershell -Command \"Get-Process mysqld -ErrorAction SilentlyContinue\" 2>&1)",
+      "Bash(powershell -Command \"Get-Process mysqld -ErrorAction SilentlyContinue | Stop-Process -Force\" 2>&1; sleep 2; powershell -Command \"Start-Process 'net' -ArgumentList 'start MySQL80' -Verb RunAs -Wait\" 2>&1; echo \"done\")",
+      "Bash(\"C:/Program Files/MySQL/MySQL Server 8.0/bin/mysqladmin.exe\" -u root shutdown 2>&1; sleep 3; powershell -Command \"Start-Process 'net' -ArgumentList 'start MySQL80' -Verb RunAs -Wait\" 2>&1; echo \"done\")",
+      "Bash(cd \"C:/Users/PC-Emanuel/Desktop/easy-back\" && npx prisma generate 2>&1)",
+      "Bash(taskkill /F /IM node.exe 2>&1; echo \"done\")",
+      "Bash(cmd /c \"taskkill /F /IM node.exe\" 2>&1; echo \"done\")",
+      "Bash(sleep 2 && cd \"C:/Users/PC-Emanuel/Desktop/easy-back\" && npx prisma generate 2>&1)",
+      "Bash(curl -s http://localhost:3000/health 2>&1 && curl -s http://localhost:3000/transacao 2>&1 | head -20)",
+      "Bash(powershell -Command \"Start-Process powershell -ArgumentList 'Add-MpPreference -ExclusionPath \\\\\"C:\\\\\\\\Users\\\\\\\\PC-Emanuel\\\\\\\\Desktop\\\\\\\\easy-back\\\\\\\\node_modules\\\\\"' -Verb RunAs -Wait\" 2>&1; echo \"done\")",
+      "Bash(powershell -Command \"Start-Process powershell -ArgumentList 'Remove-Item -Force \\\\\"C:\\\\\\\\Users\\\\\\\\PC-Emanuel\\\\\\\\Desktop\\\\\\\\easy-back\\\\\\\\node_modules\\\\\\\\.prisma\\\\\\\\client\\\\\\\\query_engine-windows.dll.node\\\\\" -ErrorAction SilentlyContinue' -Verb RunAs -Wait\" 2>&1; echo \"done\")",
+      "Bash(cd \"C:/Users/PC-Emanuel/Desktop/easy-back\" && set PRISMA_CLI_QUERY_ENGINE_TYPE=binary && npx prisma generate 2>&1)",
+      "Bash(cmd /c \"taskkill /F /IM node.exe /T\" 2>&1; echo \"done\")",
+      "Bash(sleep 3 && cd \"C:/Users/PC-Emanuel/Desktop/easy-back\" && npx prisma generate 2>&1)",
+      "Bash(powershell -Command \"Start-Process powershell -ArgumentList 'takeown /F \\\\\"C:\\\\\\\\Users\\\\\\\\PC-Emanuel\\\\\\\\Desktop\\\\\\\\easy-back\\\\\\\\node_modules\\\\\\\\.prisma\\\\\\\\client\\\\\\\\query_engine-windows.dll.node\\\\\"; icacls \\\\\"C:\\\\\\\\Users\\\\\\\\PC-Emanuel\\\\\\\\Desktop\\\\\\\\easy-back\\\\\\\\node_modules\\\\\\\\.prisma\\\\\\\\client\\\\\\\\query_engine-windows.dll.node\\\\\" /grant Everyone:F /T' -Verb RunAs -Wait\" 2>&1; echo \"done\")"
+    ]
+  }
+}

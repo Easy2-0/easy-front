@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  AreaChart, Area, CartesianGrid,
   Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { usePortfolio } from '../../context/PortfolioContext';
@@ -131,13 +131,12 @@ const Cripto = () => {
     <div className="flex flex-col gap-6 pb-10">
       
       {/* Hero da Carteira Real */}
-      <div className="bg-c-accent rounded-3xl p-6 text-white shadow-xl shadow-c-accent/20 overflow-hidden relative group">
-        <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
-        <p className="text-white/60 text-xs font-bold tracking-widest uppercase mb-1">Patrimônio em Cripto</p>
-        <h2 className="text-3xl font-black">{formatarBrl(saldoTotalBrl)}</h2>
+      <div className="bg-c-surface rounded-3xl p-6 border border-c-border overflow-hidden">
+        <p className="text-c-text/50 text-xs font-bold tracking-widest uppercase mb-1">Patrimônio em Cripto</p>
+        <h2 className="text-3xl font-black text-c-text">{formatarBrl(saldoTotalBrl)}</h2>
         <div className="flex items-center gap-2 mt-4">
-          <span className="text-[10px] bg-white/20 px-2 py-1 rounded-lg font-bold">LIVE 2026</span>
-          <p className="text-white/40 text-[10px] font-bold uppercase tracking-tighter">Dados em tempo real</p>
+          <span className="text-[10px] bg-c-accent/10 text-c-accent px-2 py-1 rounded-lg font-bold">LIVE 2026</span>
+          <p className="text-c-text/30 text-[10px] font-bold uppercase tracking-tighter">Dados em tempo real</p>
         </div>
       </div>
 
@@ -250,7 +249,7 @@ const Cripto = () => {
                         </div>
                         <button 
                             onClick={() => handleSalvarQtd(moeda.id)}
-                            className="bg-c-accent text-white px-4 rounded-xl text-xs font-bold hover:brightness-110 transition-all cursor-pointer border-none h-10"
+                            className="bg-c-accent text-white px-4 rounded-xl text-xs font-bold transition-all cursor-pointer border-none h-10"
                         >
                             Salvar
                         </button>
