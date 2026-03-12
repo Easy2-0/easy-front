@@ -3,6 +3,8 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer,
 } from 'recharts';
+import { TipoInvestimentoEnum } from '../../constants/taxRules';
+import { calculateInvestmentTax } from '../../hooks/useTaxCalculator';
 
 // ---------------------------------------------------------------------------
 // Tipos
@@ -10,6 +12,7 @@ import {
 
 interface TipoInvestimento {
   id: string;
+  enum: TipoInvestimentoEnum;
   label: string;
   emoji: string;
   taxaAnual: number;
@@ -17,73 +20,61 @@ interface TipoInvestimento {
   descricaoCurta: string;
   irInfo: string;
   irBadge: string;
-  calcularIR: (rendimentoBruto: number, meses: number) => number;
+  isentoManual?: boolean; // Para poupança que é um caso especial
 }
 
 // ---------------------------------------------------------------------------
-// IR
-// ---------------------------------------------------------------------------
-
-function irRendaFixa(rendimentoBruto: number, meses: number): number {
-  let aliquota: number;
-  if (meses <= 6) aliquota = 0.225;
-  else if (meses <= 12) aliquota = 0.20;
-  else if (meses <= 24) aliquota = 0.175;
-  else aliquota = 0.15;
-  return rendimentoBruto * aliquota;
-}
-
-function aliquotaLabel(meses: number) {
-  if (meses <= 6) return 'IR 22,5%';
-  if (meses <= 12) return 'IR 20%';
-  if (meses <= 24) return 'IR 17,5%';
-  return 'IR 15%';
-}
-
-// ---------------------------------------------------------------------------
-// Investimentos
+// Investimentos (Baseado nas regras de 2026)
 // ---------------------------------------------------------------------------
 
 const TIPOS: TipoInvestimento[] = [
   {
-    id: 'poupanca', label: 'Poupança', emoji: '🐖',
+    id: 'poupanca', enum: TipoInvestimentoEnum.RENDA_FIXA, label: 'Poupança', emoji: '🐖',
     taxaAnual: 6.17, cor: '#60a5fa',
     descricaoCurta: '6,17% a.a.',
     irInfo: 'Isenta de IR', irBadge: 'Isento',
-    calcularIR: () => 0,
+    isentoManual: true,
   },
   {
-    id: 'cdb', label: 'CDB', emoji: '🏦',
+    id: 'cdb', enum: TipoInvestimentoEnum.RENDA_FIXA, label: 'CDB', emoji: '🏦',
     taxaAnual: 11.0, cor: '#2bb39a',
     descricaoCurta: '11% a.a.',
     irInfo: 'IR regressivo até 15%', irBadge: 'IR reg.',
-    calcularIR: irRendaFixa,
   },
   {
-    id: 'tesouro', label: 'Tesouro Selic', emoji: '🇧🇷',
+    id: 'tesouro', enum: TipoInvestimentoEnum.RENDA_FIXA, label: 'Tesouro Selic', emoji: '🇧🇷',
     taxaAnual: 10.5, cor: '#a78bfa',
     descricaoCurta: '10,5% a.a.',
     irInfo: 'IR regressivo até 15%', irBadge: 'IR reg.',
-    calcularIR: irRendaFixa,
   },
   {
-    id: 'ipca', label: 'IPCA+', emoji: '📈',
-    taxaAnual: 10.5, cor: '#fb923c',
-    descricaoCurta: '~10,5% a.a.',
-    irInfo: 'IR regressivo até 15%', irBadge: 'IR reg.',
-    calcularIR: irRendaFixa,
-  },
-  {
-    id: 'acoes', label: 'Ações', emoji: '📊',
+    id: 'acoes', enum: TipoInvestimentoEnum.ACOES, label: 'Ações', emoji: '📊',
     taxaAnual: 12.0, cor: '#f472b6',
     descricaoCurta: '~12% a.a.',
-    irInfo: '15% sobre o lucro', irBadge: 'IR 15%',
-    calcularIR: (r) => r * 0.15,
+    irInfo: '15% sobre o lucro (Isento até 20k/mês)', irBadge: 'IR 15%',
+  },
+  {
+    id: 'fiis', enum: TipoInvestimentoEnum.FIIS, label: 'FIIs', emoji: '🏢',
+    taxaAnual: 10.0, cor: '#facc15',
+    descricaoCurta: '10% a.a. + Proventos',
+    irInfo: '20% fixo sobre o lucro', irBadge: 'IR 20%',
+  },
+  {
+    id: 'cripto', enum: TipoInvestimentoEnum.CRIPTO, label: 'Cripto', emoji: '₿',
+    taxaAnual: 25.0, cor: '#f97316',
+    descricaoCurta: 'Retorno variável',
+    irInfo: '15% sobre o lucro (Isento até 35k/mês)', irBadge: 'IR 15%',
+  },
+  {
+    id: 'dividendos', enum: TipoInvestimentoEnum.DIVIDENDOS, label: 'Dividendos', emoji: '💰',
+    taxaAnual: 8.0, cor: '#22c55e',
+    descricaoCurta: 'Renda passiva',
+    irInfo: '15% sobre o excedente (Isento até 50k/mês)', irBadge: 'IR 15%',
   },
 ];
 
 // ---------------------------------------------------------------------------
-// Cálculos
+// Cálculos Centralizados
 // ---------------------------------------------------------------------------
 
 function calcularBruto(p: number, pmt: number, n: number, taxa: number) {
@@ -93,36 +84,51 @@ function calcularBruto(p: number, pmt: number, n: number, taxa: number) {
   return p * f + pmt * ((f - 1) / r);
 }
 
+function obterDataAplicacao(meses: number): Date {
+  const data = new Date();
+  data.setMonth(data.getMonth() - meses);
+  return data;
+}
+
 function calcularResultado(p: number, pmt: number, n: number, tipo: TipoInvestimento) {
   const aportado = p + pmt * n;
   const totalBruto = calcularBruto(p, pmt, n, tipo.taxaAnual);
   const rendBruto = Math.max(0, totalBruto - aportado);
-  const ir = tipo.calcularIR(rendBruto, n);
+  
+  // Usando a lógica centralizada de impostos
+  const taxResult = tipo.isentoManual 
+    ? { valorImposto: 0, aliquotaAplicada: 0, isento: true }
+    : calculateInvestmentTax({
+        valorBruto: totalBruto,
+        rendimentoBruto: rendBruto,
+        dataAplicacao: obterDataAplicacao(n),
+        tipoInvestimento: tipo.enum,
+      });
+
+  const ir = taxResult.valorImposto;
   const rendLiquido = rendBruto - ir;
-  return { aportado, totalBruto, rendBruto, ir, rendLiquido, totalLiquido: aportado + rendLiquido };
+  
+  return { 
+    aportado, 
+    totalBruto, 
+    rendBruto, 
+    ir, 
+    rendLiquido, 
+    totalLiquido: aportado + rendLiquido,
+    aliquota: taxResult.aliquotaAplicada,
+    isento: taxResult.isento
+  };
 }
 
 function calcularEvolucao(p: number, pmt: number, n: number, tipo: TipoInvestimento) {
   const passo = Math.max(1, Math.ceil(n / 24));
-  const pts: { label: string; liquido: number; aportado: number }[] = [];
+  const pts: any[] = [];
   for (let i = 0; i <= n; i += passo) {
-    const ap = p + pmt * i;
-    const bruto = calcularBruto(p, pmt, i, tipo.taxaAnual);
-    const rend = Math.max(0, bruto - ap);
-    const ir = tipo.calcularIR(rend, i);
+    const res = calcularResultado(p, pmt, i, tipo);
     const a = Math.floor(i / 12), m = i % 12;
     const label = i === 0 ? 'Início' : a === 0 ? `${i}m` : m === 0 ? `${a}a` : `${a}a${m}m`;
-    pts.push({ label, aportado: Math.round(ap * 100) / 100, liquido: Math.round((ap + rend - ir) * 100) / 100 });
+    pts.push({ label, aportado: Math.round(res.aportado * 100) / 100, liquido: Math.round(res.totalLiquido * 100) / 100 });
   }
-  const last = pts[pts.length - 1];
-  const ap = p + pmt * n;
-  const bruto = calcularBruto(p, pmt, n, tipo.taxaAnual);
-  const rend = Math.max(0, bruto - ap);
-  const ir = tipo.calcularIR(rend, n);
-  const a = Math.floor(n / 12), m = n % 12;
-  const labelFinal = a === 0 ? `${n}m` : m === 0 ? `${a}a` : `${a}a${m}m`;
-  if (last?.label !== labelFinal)
-    pts.push({ label: labelFinal, aportado: Math.round(ap * 100) / 100, liquido: Math.round((ap + rend - ir) * 100) / 100 });
   return pts;
 }
 
@@ -392,7 +398,7 @@ const Calculadora = () => {
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-c-text/40 text-[10px] font-semibold uppercase tracking-wide">
-              {res.ir === 0 ? 'IR' : tipo.id !== 'acoes' ? aliquotaLabel(totalMeses) : 'IR 15%'}
+              {res.ir === 0 ? 'IR' : `IR ${(res.aliquota * 100).toFixed(1)}%`}
             </span>
             <span className="text-c-negative font-bold text-sm">
               {res.ir === 0 ? 'Isento' : `−${fmt(res.ir)}`}

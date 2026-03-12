@@ -9,6 +9,7 @@ import Layout from './components/Layout';
 import Geral from './components/geral/Geral';
 import Gastos from './components/gastos/Gastos';
 import Saldo from './components/saldo/Saldo';
+import Cripto from './components/cripto/Cripto';
 import TelaPlaceholder from './components/tela-placeholder/TelaPlaceholder';
 import Calculadora from './components/investimentos/Calculadora';
 import Calendario from './components/calendario/Calendario';
@@ -28,6 +29,7 @@ function App() {
             <Route path="/geral" element={<Geral />} />
             <Route path="/gastos" element={<Gastos />} />
             <Route path="/saldo" element={<Saldo />} />
+            <Route path="/cripto" element={<Cripto />} />
             <Route path="/investimentos" element={<Calculadora />} />
             <Route path="/calendario" element={<Calendario />} />
           </Route>

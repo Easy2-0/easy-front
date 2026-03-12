@@ -8,6 +8,7 @@ const navItems = [
   { label: 'Saldo', rota: '/saldo' },
   { label: 'Transações', rota: '/gastos' },
   { label: 'Investimentos', rota: '/investimentos' },
+  { label: 'Cripto', rota: '/cripto' },
   { label: 'Calendário', rota: '/calendario' },
 ];
 

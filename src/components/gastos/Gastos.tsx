@@ -395,12 +395,26 @@ const Gastos = () => {
   // -------------------------------------------------------------------------
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-6">
 
-      {/* Título */}
-      <div>
-        <h1 className="text-c-text text-xl font-bold">Transações</h1>
-        <p className="text-c-text/50 text-sm mt-1">Gerencie suas entradas e saídas</p>
+      {/* Header com Título e Botão (Adaptado para todos os tamanhos) */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h1 className="text-c-text text-lg sm:text-xl font-bold truncate">Transações</h1>
+          <p className="text-c-text/50 text-[11px] sm:text-sm mt-0.5 sm:mt-1 truncate">Gerencie suas entradas e saídas</p>
+        </div>
+
+        {/* Botão Nova Transação - Redimensionado no Mobile */}
+        <button
+          onClick={() => abrirModal()}
+          className="flex items-center justify-center gap-1.5 sm:gap-2.5 px-3 sm:px-6 h-9 sm:h-11 rounded-xl sm:rounded-2xl bg-c-accent text-white shadow-lg shadow-c-accent/20 hover:shadow-c-accent/40 hover:brightness-110 active:scale-95 cursor-pointer border-none transition-all duration-300 shrink-0"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="sm:w-[18px] sm:h-[18px]">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span className="text-[11px] sm:text-sm font-bold tracking-wide whitespace-nowrap">Nova transação</span>
+        </button>
       </div>
 
       {/* Carregando */}
@@ -412,17 +426,17 @@ const Gastos = () => {
 
       {/* Estado vazio */}
       {!carregando && movimentos.length === 0 && (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
+        <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 px-4 text-center">
           <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-c-surface border border-c-border">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-c-accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
           </div>
-          <p className="text-c-text/40 text-sm text-center">
-            Você ainda não possui nenhuma transação.{' '}
-            <button onClick={abrirModal} className="text-c-accent font-semibold hover:text-c-accent/70 transition-colors cursor-pointer bg-transparent border-none">
-              Criar aqui
+          <p className="text-c-text/40 text-sm">
+            Você ainda não possui nenhuma transação.<br />
+            <button onClick={() => abrirModal()} className="text-c-accent font-semibold hover:text-c-accent/70 transition-colors cursor-pointer bg-transparent border-none mt-2">
+              Clique para adicionar a primeira
             </button>
           </p>
         </div>
@@ -434,67 +448,63 @@ const Gastos = () => {
           {movimentos.map((t) => (
             <div
               key={t.id}
-              className="flex items-center justify-between bg-c-surface border border-c-border rounded-2xl px-6 py-4"
+              className="flex flex-col sm:flex-row sm:items-center justify-between bg-c-surface border border-c-border rounded-2xl px-5 py-4 gap-3"
             >
-              {/* Dados */}
-              <div className="flex flex-col gap-1">
-                <span className="text-c-text font-bold text-base tracking-wide">{t.nome}</span>
-                {t.descricao && (
-                  <span className="text-c-text/40 text-xs">{t.descricao}</span>
-                )}
-                <span className="text-c-text/30 text-xs">{new Date(t.data).toLocaleDateString('pt-BR')}</span>
+              <div className="flex items-center justify-between sm:justify-start gap-4 flex-1">
+                {/* Dados */}
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <span className="text-c-text font-bold text-base tracking-wide truncate">{t.nome}</span>
+                  {t.descricao && (
+                    <span className="text-c-text/40 text-xs truncate max-w-[200px] sm:max-w-none">{t.descricao}</span>
+                  )}
+                  <span className="text-c-text/30 text-[10px] mt-0.5">{new Date(t.data).toLocaleDateString('pt-BR')}</span>
+                </div>
+
+                {/* Valor (visível no mobile à direita do nome) */}
+                <span className={`sm:hidden font-bold text-base whitespace-nowrap ${isReceita(t.tipo) ? 'text-c-positive' : 'text-c-negative'}`}>
+                  {isReceita(t.tipo) ? '+' : '-'} {formatarValor(t.valor)}
+                </span>
               </div>
 
-              {/* Valor e ações */}
-              <div className="flex items-center gap-4">
-                <span className={`font-bold text-base ${isReceita(t.tipo) ? 'text-c-positive' : 'text-c-negative'}`}>
+              {/* Valor e ações (Desktop) / Ações (Mobile) */}
+              <div className="flex items-center justify-between sm:justify-end gap-4 border-t border-c-border/50 sm:border-none pt-3 sm:pt-0">
+                {/* Valor - Apenas Desktop */}
+                <span className={`hidden sm:block font-bold text-base whitespace-nowrap ${isReceita(t.tipo) ? 'text-c-positive' : 'text-c-negative'}`}>
                   {isReceita(t.tipo) ? '+' : '-'} {formatarValor(t.valor)}
                 </span>
 
-                {/* Editar */}
-                <button
-                  onClick={() => abrirModalEdicao(t)}
-                  title="Editar"
-                  className="text-c-text/30 hover:text-c-text transition-colors cursor-pointer bg-transparent border-none"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                </button>
+                <div className="flex items-center gap-5 sm:gap-4 ml-auto sm:ml-0">
+                  {/* Editar */}
+                  <button
+                    onClick={() => abrirModalEdicao(t)}
+                    className="p-2 sm:p-0 text-c-text/30 hover:text-c-text transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                    <span className="sm:hidden text-xs font-semibold">Editar</span>
+                  </button>
 
-                {/* Remover */}
-                <button
-                  onClick={() => handleRemover(t)}
-                  title="Excluir"
-                  className="text-c-negative/50 hover:text-c-negative transition-colors cursor-pointer bg-transparent border-none"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                    <path d="M10 11v6M14 11v6" />
-                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                  </svg>
-                </button>
+                  {/* Remover */}
+                  <button
+                    onClick={() => handleRemover(t)}
+                    className="p-2 sm:p-0 text-c-negative/50 hover:text-c-negative transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                      <path d="M10 11v6M14 11v6" />
+                      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                    </svg>
+                    <span className="sm:hidden text-xs font-semibold">Excluir</span>
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
-
-      {/* FAB estendido */}
-      <button
-        onClick={() => abrirModal()}
-        className={`fixed right-6 top-20 z-50 flex items-center gap-2.5 px-5 h-12 rounded-full bg-c-accent text-white shadow-lg shadow-c-accent/40 hover:shadow-c-accent/60 hover:brightness-110 active:scale-95 cursor-pointer border-none transition-all duration-300 ${
-          fabVisivel ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
-        }`}
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        <span className="text-sm font-bold tracking-wide whitespace-nowrap">Nova transação</span>
-      </button>
 
       {/* Modal */}
       {toast && (
